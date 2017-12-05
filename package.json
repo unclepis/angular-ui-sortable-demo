@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "angular-ui-sortable": "^0.18.0"
+  }
+}

@@ -1,0 +1,88 @@
+<html>
+
+<head>
+    <style>
+        ul li {
+            list-style: none;
+        }
+
+        .container {
+            border: 1px solid red;
+            margin: 10px 50px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            height: 600px;
+            width: 90%;
+            align-content: stretch;
+        }
+
+        .tree {
+            border: 1px solid green;
+            height: calc( 50% - 2px);
+            width: 150px;
+        }
+
+        .gis {
+            border: 1px solid blue;
+            width: calc( 100% - 152px);
+            height: 100%;
+            margin-right: 150px;
+            /* width: 55%; */
+        }
+        /* .gis:hover {
+            width: calc( 100% - 302px);
+        } */
+    </style>
+    <script src="bower_components/jquery/dist/jquery.min.js">
+
+    </script>
+    <script src="bower_components/jquery-ui/jquery-ui.min.js">
+
+    </script>
+    <script src="bower_components/angular/angular.min.js">
+
+    </script>
+    <script src="bower_components/angular-ui-sortable/sortable.js">
+
+    </script>
+    <script>
+        var myApp = angular.module('myApp', ['ui.sortable']);
+        myApp.controller('myController', function ($scope) {
+            $scope.items = [1, 2, 3];
+            $scope.sortableOptions = {
+                // 'ui-floating': true,
+                update: function (e, ui) {
+                    console.log(e + ui)
+                },
+                start:function(e,ui){
+                    console.log('start');
+                },
+                stop:function(){
+                    console.log('stop');
+                }
+                // axis: 'x'
+            };
+
+        });
+    </script>
+</head>
+
+<body ng-app="myApp">
+    <!-- <div ng-controller="myController">
+        <ul ui-sortable="sortableOptions" ng-model="items">
+            <li ng-repeat="item in items">{{item}}</li>
+        </ul>
+    </div> -->
+    <div ng-controller="myController">
+        <div class='container' ui-sortable="sortableOptions" ng-model='items'>
+            <div ng-repeat="item in items" ng-class='{"gis":item===3,"tree":item!==3}'>
+                <div ng-if="item ===1">{{item}}</div>
+                <div ng-if="item ===2">{{item}}</div>
+                <div ng-if="item ===3">{{item}}</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
