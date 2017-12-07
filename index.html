@@ -14,25 +14,39 @@
             flex-wrap: wrap;
             height: 600px;
             width: 90%;
-            align-content: stretch;
+            align-content: space-between;
         }
 
         .tree {
             border: 1px solid green;
             height: calc( 50% - 2px);
-            width: 150px;
+            width: 190px;
+            flex-grow: 1;
         }
 
         .gis {
             border: 1px solid blue;
-            width: calc( 100% - 152px);
+            width: 82%;
             height: 100%;
-            margin-right: 150px;
-            /* width: 55%; */
         }
-        /* .gis:hover {
-            width: calc( 100% - 302px);
-        } */
+
+        .button-container {
+            display: flex;
+            flex-flow: column nowrap;
+            width: 30px;
+        }
+
+        .app-container {
+            display: flex;
+        }
+
+        .auto-gis {
+            width: calc( 82% - 190px);
+        }
+
+        .auto-full {
+            width: 100%;
+        }
     </style>
     <script src="bower_components/jquery/dist/jquery.min.js">
 
@@ -48,38 +62,123 @@
     </script>
     <script>
         var myApp = angular.module('myApp', ['ui.sortable']);
-        myApp.controller('myController', function ($scope) {
-            $scope.items = [1, 2, 3];
-            $scope.sortableOptions = {
-                // 'ui-floating': true,
-                update: function (e, ui) {
-                    console.log(e + ui)
+        myApp.controller('myController', function ($scope, $window, $timeout) {
+            // 初始化数据
+            var vm = this;
+            vm.isAuto = false; // gis地图需不需要自适应的开关
+            vm.isFull = false; // gis需要全屏幕开关
+            vm.buttons = [
+                {
+                    name: 'poleTree'
                 },
-                start:function(e,ui){
+                {
+                    name: 'normalTree'
+                }
+            ];
+
+            // 从localStorage上获取排序数组数据
+            $window.localStorage.setItem('items', ['normalTree', 'gis']); // 模拟用户上一次页面刷新前布局数据l
+            $scope.items = $window.localStorage.items.split(','); // 从localStorage上获取用户上一次布局数据
+
+            // 按钮
+            vm.toggleTree = toggleTree; // 树显示隐藏的回调函数
+
+
+            // 点击切换两棵树的隐藏和显示
+            function toggleTree(treeName) {
+                var addOrDelete = $scope.items.some(function (item) {
+                    return item === treeName;
+                });
+                if (addOrDelete) {
+                    $scope.items = $scope.items.filter(function (item) {
+                        return item !== treeName;
+                    });
+                    if ($scope.items.length === 1) {
+                        vm.isAuto = false;
+                        vm.isFull = true;
+                    } else {
+                        vm.isAuto = false;
+                        vm.isFull = false;
+                    }
+                } else {
+                    if ($scope.items.length === 1) {
+                        $scope.items.unshift(treeName);
+                        vm.isFull = false;
+                        vm.isAuto = false;
+                    } else {
+                        if (treeName === 'normalTree') {
+                            if ($scope.items[1] === 'gis') {
+                                $scope.items.unshift(treeName);
+                            } else {
+                                $scope.items.splice(1, 0, treeName);
+                            }
+                            _updateGis($scope.items);
+                        } else {
+                            if ($scope.items[1] === 'gis') {
+                                $scope.items.splice(1, 0, treeName);
+                            } else {
+                                $scope.items.push(treeName);
+                            }
+                            _updateGis($scope.items);
+                        }
+                        vm.isFull = false;
+                    }
+                }
+            }
+
+            // 配置angular-ui-sortable提供的事件函数
+            $scope.sortableOptions = {
+                // 拖拽后$scope.items数组顺序发生更新的回调函数
+                update: function (e, ui) {
+                    var updatedArray = [];
+                    $timeout(function () { // 异步获取拖拽后的数据存在updatedArray数组中
+                        for (var i = 0; i < $scope.items.length; i++) {
+                            updatedArray.push($scope.items[i]);
+                        }
+                        _updateGis(updatedArray); // 根据拖拽后$scope.items数组的顺序控制gis快是否需要自适应调整宽度
+                    });
+                },
+
+                // 鼠标按住拖拽模块开始异动触发的回调函数
+                start: function (e, ui) {
                     console.log('start');
                 },
-                stop:function(){
+
+                // 拖拽完成后触发的回调函数
+                stop: function () {
                     console.log('stop');
                 }
-                // axis: 'x'
+                // axis: 'x' 这个参数可以控制拖拽的方向，如果为x只能沿着水平方向发生拖拽
             };
 
+            // 根据拖拽后新数组的顺序更新gis这个dom快的class让它自适应
+            function _updateGis(currentArray) {
+                if (currentArray.length === 2) {
+                    vm.isAuto = false;
+                } else {
+                    if (currentArray[1] === 'gis') {
+                        vm.isAuto = true;
+                    } else {
+                        vm.isAuto = false;
+                    }
+                }
+            }
         });
     </script>
 </head>
 
 <body ng-app="myApp">
-    <!-- <div ng-controller="myController">
-        <ul ui-sortable="sortableOptions" ng-model="items">
-            <li ng-repeat="item in items">{{item}}</li>
-        </ul>
-    </div> -->
-    <div ng-controller="myController">
+    <div ng-controller="myController as $ctrl" class="app-container">
+        <div class="button-container">
+            <div ng-repeat="button in $ctrl.buttons">
+                <button ng-click="$ctrl.toggleTree(button.name)">{{button.name}}</button>
+            </div>
+        </div>
         <div class='container' ui-sortable="sortableOptions" ng-model='items'>
-            <div ng-repeat="item in items" ng-class='{"gis":item===3,"tree":item!==3}'>
-                <div ng-if="item ===1">{{item}}</div>
-                <div ng-if="item ===2">{{item}}</div>
-                <div ng-if="item ===3">{{item}}</div>
+            <div ng-repeat="item in items" ng-class='[{"gis":item==="gis","tree":item!=="gis"},{"auto-gis":item==="gis"&&$ctrl.isAuto},{"auto-full":item==="gis"&&$ctrl.isFull}]'>
+                <div ng-if="item ==='normalTree'">{{item}}</div>
+                <div ng-if="item ==='poleTree'">{{item}}</div>
+                <div ng-if="item ==='gis'">{{item}}</div>
             </div>
         </div>
     </div>
