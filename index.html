@@ -14,25 +14,45 @@
             flex-wrap: wrap;
             height: 600px;
             width: 90%;
-            align-content: stretch;
+            align-content: space-between;
         }
 
         .tree {
             border: 1px solid green;
             height: calc( 50% - 2px);
-            width: 150px;
+            width: 190px;
+            flex-grow: 1;
         }
 
         .gis {
             border: 1px solid blue;
-            width: calc( 100% - 152px);
+            /* max-width: calc( 100% - 152px); */
+            width: 82%;
             height: 100%;
-            margin-right: 150px;
+            /* margin-right: 150px; */
             /* width: 55%; */
         }
+
+        .button-container {
+            display: flex;
+            flex-flow: column nowrap;
+            width: 30px;
+        }
+
+        .app-container {
+            display: flex;
+        }
+
+        .auto-gis {
+            width: calc( 82% - 190px);
+        }
+
+        .auto-full {
+            width: 100%;
+        }
         /* .gis:hover {
-            width: calc( 100% - 302px);
-        } */
+                    width: calc( 100% - 302px);
+                } */
     </style>
     <script src="bower_components/jquery/dist/jquery.min.js">
 
@@ -48,21 +68,100 @@
     </script>
     <script>
         var myApp = angular.module('myApp', ['ui.sortable']);
-        myApp.controller('myController', function ($scope) {
-            $scope.items = [1, 2, 3];
+        myApp.controller('myController', function ($scope, $window, $timeout) {
+            // 只是想试一下绑在vm上，定义的按钮控制树的收缩
+            var vm = this;
+            vm.buttons = [
+                {
+                    name: 'poleTree'
+                },
+                {
+                    name: 'normalTree'
+                }
+            ];
+
+            // 从localStorage上获取排序数组数据
+            $window.localStorage.setItem('items', ['normalTree', 'gis']);
+            $scope.items = $window.localStorage.items.split(',');
+
+            // 按钮
+            vm.toggleTree = toggleTree; // 树显示隐藏的回调函数
+            vm.isAuto = false; // gis地图需不需要自适应的开关
+            vm.isFull = false; // gis需要全屏幕
+            // 点击切换两棵树的隐藏和显示
+            function toggleTree(treeName) {
+                var addOrDelete = $scope.items.some(function (item) {
+                    return item === treeName;
+                });
+                if (addOrDelete) {
+                    $scope.items = $scope.items.filter(function (item) {
+                        return item !== treeName;
+                    });
+                    if ($scope.items.length === 1) {
+                        vm.isAuto = false;
+                        vm.isFull = true;
+                    } else {
+                        vm.isAuto = false;
+                        vm.isFull = false;
+                    }
+                } else {
+                    if ($scope.items.length === 1) {
+                        $scope.items.unshift(treeName);
+                        vm.isFull = false;
+                        vm.isAuto = false;
+                    } else {
+                        if (treeName === 'normalTree') {
+                            if ($scope.items[1] === 'gis') {
+                                $scope.items.unshift(treeName);
+                            } else {
+                                $scope.items.splice(1, 0, treeName);
+                            }
+                            _updateGis($scope.items);
+                        } else {
+                            if ($scope.items[1] === 'gis') {
+                                $scope.items.splice(1, 0, treeName);
+                            } else {
+                                $scope.items.push(treeName);
+                            }
+                            _updateGis($scope.items);
+                        }
+                        vm.isFull = false;
+                    }
+                }
+            }
+
+
+            // $scope.items = ['poleTree', 'normalTree', 'gis'];
             $scope.sortableOptions = {
                 // 'ui-floating': true,
                 update: function (e, ui) {
+                    var updatedArray = [];
+                    $timeout(function () {
+                        for (var i = 0; i < $scope.items.length; i++) {
+                            updatedArray.push($scope.items[i]);
+                        }
+                        _updateGis(updatedArray);
+                    });
+
                     console.log(e + ui)
+
                 },
-                start:function(e,ui){
+                start: function (e, ui) {
                     console.log('start');
                 },
-                stop:function(){
+                stop: function () {
                     console.log('stop');
                 }
                 // axis: 'x'
             };
+
+            function _updateGis(currentArray) {
+                if (currentArray[1] === 'gis') {
+                    vm.isAuto = true;
+                } else {
+                    vm.isAuto = false;
+                }
+            }
 
         });
     </script>
@@ -70,16 +169,21 @@
 
 <body ng-app="myApp">
     <!-- <div ng-controller="myController">
-        <ul ui-sortable="sortableOptions" ng-model="items">
-            <li ng-repeat="item in items">{{item}}</li>
-        </ul>
-    </div> -->
-    <div ng-controller="myController">
+                <ul ui-sortable="sortableOptions" ng-model="items">
+                    <li ng-repeat="item in items">{{item}}</li>
+                </ul>
+            </div> -->
+    <div ng-controller="myController as $ctrl" class="app-container">
+        <div class="button-container">
+            <div ng-repeat="button in $ctrl.buttons">
+                <button ng-click="$ctrl.toggleTree(button.name)">{{button.name}}</button>
+            </div>
+        </div>
         <div class='container' ui-sortable="sortableOptions" ng-model='items'>
-            <div ng-repeat="item in items" ng-class='{"gis":item===3,"tree":item!==3}'>
-                <div ng-if="item ===1">{{item}}</div>
-                <div ng-if="item ===2">{{item}}</div>
-                <div ng-if="item ===3">{{item}}</div>
+            <div ng-repeat="item in items" ng-class='[{"gis":item==="gis","tree":item!=="gis"},{"auto-gis":item==="gis"&&$ctrl.isAuto},{"auto-full":item==="gis"&&$ctrl.isFull}]'>
+                <div ng-if="item ==='normalTree'">{{item}}</div>
+                <div ng-if="item ==='poleTree'">{{item}}</div>
+                <div ng-if="item ==='gis'">{{item}}</div>
             </div>
         </div>
     </div>
