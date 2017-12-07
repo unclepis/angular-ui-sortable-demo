@@ -26,11 +26,8 @@
 
         .gis {
             border: 1px solid blue;
-            /* max-width: calc( 100% - 152px); */
             width: 82%;
             height: 100%;
-            /* margin-right: 150px; */
-            /* width: 55%; */
         }
 
         .button-container {
@@ -50,9 +47,6 @@
         .auto-full {
             width: 100%;
         }
-        /* .gis:hover {
-                    width: calc( 100% - 302px);
-                } */
     </style>
     <script src="bower_components/jquery/dist/jquery.min.js">
 
@@ -69,8 +63,10 @@
     <script>
         var myApp = angular.module('myApp', ['ui.sortable']);
         myApp.controller('myController', function ($scope, $window, $timeout) {
-            // 只是想试一下绑在vm上，定义的按钮控制树的收缩
+            // 初始化数据
             var vm = this;
+            vm.isAuto = false; // gis地图需不需要自适应的开关
+            vm.isFull = false; // gis需要全屏幕开关
             vm.buttons = [
                 {
                     name: 'poleTree'
@@ -81,13 +77,13 @@
             ];
 
             // 从localStorage上获取排序数组数据
-            $window.localStorage.setItem('items', ['normalTree', 'gis']);
-            $scope.items = $window.localStorage.items.split(',');
+            $window.localStorage.setItem('items', ['normalTree', 'gis']); // 模拟用户上一次页面刷新前布局数据l
+            $scope.items = $window.localStorage.items.split(','); // 从localStorage上获取用户上一次布局数据
 
             // 按钮
             vm.toggleTree = toggleTree; // 树显示隐藏的回调函数
-            vm.isAuto = false; // gis地图需不需要自适应的开关
-            vm.isFull = false; // gis需要全屏幕
+
+
             // 点击切换两棵树的隐藏和显示
             function toggleTree(treeName) {
                 var addOrDelete = $scope.items.some(function (item) {
@@ -130,49 +126,48 @@
                 }
             }
 
-
-            // $scope.items = ['poleTree', 'normalTree', 'gis'];
+            // 配置angular-ui-sortable提供的事件函数
             $scope.sortableOptions = {
-                // 'ui-floating': true,
+                // 拖拽后$scope.items数组顺序发生更新的回调函数
                 update: function (e, ui) {
                     var updatedArray = [];
-                    $timeout(function () {
+                    $timeout(function () { // 异步获取拖拽后的数据存在updatedArray数组中
                         for (var i = 0; i < $scope.items.length; i++) {
                             updatedArray.push($scope.items[i]);
                         }
-                        _updateGis(updatedArray);
+                        _updateGis(updatedArray); // 根据拖拽后$scope.items数组的顺序控制gis快是否需要自适应调整宽度
                     });
-
-                    console.log(e + ui)
-
                 },
+
+                // 鼠标按住拖拽模块开始异动触发的回调函数
                 start: function (e, ui) {
                     console.log('start');
                 },
+
+                // 拖拽完成后触发的回调函数
                 stop: function () {
                     console.log('stop');
                 }
-                // axis: 'x'
+                // axis: 'x' 这个参数可以控制拖拽的方向，如果为x只能沿着水平方向发生拖拽
             };
 
+            // 根据拖拽后新数组的顺序更新gis这个dom快的class让它自适应
             function _updateGis(currentArray) {
-                if (currentArray[1] === 'gis') {
-                    vm.isAuto = true;
-                } else {
+                if (currentArray.length === 2) {
                     vm.isAuto = false;
+                } else {
+                    if (currentArray[1] === 'gis') {
+                        vm.isAuto = true;
+                    } else {
+                        vm.isAuto = false;
+                    }
                 }
             }
-
         });
     </script>
 </head>
 
 <body ng-app="myApp">
-    <!-- <div ng-controller="myController">
-                <ul ui-sortable="sortableOptions" ng-model="items">
-                    <li ng-repeat="item in items">{{item}}</li>
-                </ul>
-            </div> -->
     <div ng-controller="myController as $ctrl" class="app-container">
         <div class="button-container">
             <div ng-repeat="button in $ctrl.buttons">
