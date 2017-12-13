@@ -1,0 +1,94 @@
+<html>
+
+<head>
+    <style>
+        .container {
+            display: flex;
+            height: 80%;
+            width: 80%;
+            border: 1px solid red;
+            margin: 30px auto;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        div {
+            flex-grow: 1;
+            border: 1px solid black;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+        }
+
+        .loading-bar-container {
+            text-align: center;
+            height: 200px;
+            width: 200px;
+            align-self: center;
+        }
+    </style>
+    <script src="bower_components/angular/angular.min.js">
+
+    </script>
+    <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css">
+    </script>
+    <script src="bower_components/angular-loading-bar/build/loading-bar.min.js">
+
+    </script>
+    <script>
+        (function (angular) {
+            angular.module('myApp', ['angular-loading-bar', 'cfp.loadingBar'])
+                .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
+                    cfpLoadingBarProvider.includeSpinner = true; // 条幅文字默认是true
+                    cfpLoadingBarProvider.includeBar = true; // 上方进度条 默认true
+                    cfpLoadingBarProvider.parentSelector = '.loading-bar-container';
+                    cfpLoadingBarProvider.spinnerTemplate = '<span class="fa fa-spinner">Custom Loading Message...</span>';
+                    cfpLoadingBarProvider.latencyThreshold = 100;
+                }])
+                .controller('myController', function ($scope, $http, $interval, cfpLoadingBar) {
+                    $scope.request = request;
+
+                    function request() {
+                        cfpLoadingBar.start();
+                        $scope.status = cfpLoadingBar.status();
+                        $scope.$watch('status', function () {
+                            if ($scope.status >= 1) {
+                                $interval.cancel(timer);
+                                cfpLoadingBar.complete();
+                            }
+                        });
+
+                        var timer = $interval(function () {
+                            $scope.status += 0.2;
+                            cfpLoadingBar.set($scope.status)
+                        }, 1000);
+                    }
+
+                });
+        })(angular);
+    </script>
+</head>
+
+<!-- <body ng-app="myApp" ng-controller="myController">
+    <div class='container'>
+        <div>Left</div>
+        <div class="loading-bar-container"><span ng-if="status<=1">{{status}}</span></div>
+        <div>Right</div>
+    </div>
+    <button ng-click="request()">Click me</button>
+</body> -->
+
+<body ng-app="myApp" ng-controller="myController">
+        <div class='container'>
+            <div>Left</div>
+            <div class="loading-bar-container"></div>
+            <div>Right</div>
+        </div>
+        <button ng-click="request()">Click me</button>
+    </body>
+
+</html>
