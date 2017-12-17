@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        .display {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+        }
+
+        .container {
+            display: flex;
+            border: 1px solid black;
+            width: 100px;
+            height: 100px;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px;
+        }
+
+        .item {
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            background-color: black;
+        }
+
+        .one-middle {
+            margin: 0 auto;
+        }
+
+        .one-right {
+            justify-content: flex-end;
+        }
+
+        .one-middle-left {
+            align-items: center;
+        }
+
+        .one-middle-middle {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .one-middle-right {
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .one-buttom-left {
+            align-items: flex-end;
+        }
+
+        .one-buttom-middle {
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .one-buttom-right {
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        .two-left {
+            justify-content: space-between;
+        }
+
+        .two-top-bottom {
+            flex-flow: column wrap;
+            justify-content: space-between;
+        }
+
+        .two-middle-middle {
+            flex-flow: column wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .two-right-right {
+            flex-flow: column wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .two-left-center {
+            align-self: center;
+        }
+
+        .two-left-center {
+            justify-content: space-between;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="display">
+        <div class="container">
+            <span class="item"></span>
+        </div>
+
+        <div class="container">
+            <span class="item one-middle"></span>
+        </div>
+
+        <div class="container one-right">
+            <span class="item"></span>
+        </div>
+
+        <div class="container one-middle-left">
+            <span class="item"></span>
+        </div>
+
+        <div class="container one-middle-middle">
+            <span class="item"></span>
+        </div>
+
+        <div class="container one-middle-right">
+            <span class="item"></span>
+        </div>
+
+        <div class="container one-buttom-left">
+            <span class="item"></span>
+        </div>
+
+        <div class="container one-buttom-middle">
+            <span class="item"></span>
+        </div>
+
+        <div class="container one-buttom-right">
+            <span class="item"></span>
+        </div>
+
+        <div class="container two-left">
+            <span class="item"></span>
+            <span class="item"></span>
+        </div>
+
+        <div class="container two-top-bottom">
+            <span class="item"></span>
+            <span class="item"></span>
+        </div>
+        <div class="container two-middle-middle">
+            <span class="item"></span>
+            <span class="item"></span>
+        </div>
+
+        <div class="container two-right-right">
+            <span class="item"></span>
+            <span class="item"></span>
+        </div>
+
+        <div class="container">
+            <span class="item"></span>
+            <span class="item two-left-center"></span>
+        </div>
+
+        <div class="container two-left-center">
+            <span class="item"></span>
+            <span class="item" style="align-self:flex-end;"></span>
+        </div>
+
+        <div class="container">
+            <span class="item"></span>
+            <span class="item" style="align-self:center;"></span>
+            <span class="item" style="align-self:flex-end;"></span>
+        </div>
+
+        <div class="container" style="justify-content:flex-end;flex-flow:row wrap; align-content:space-between;">
+            <span class="item"></span>
+            <span class="item"></span>
+            <span class="item"></span>
+            <span class="item"></span>
+        </div>
+        <div class="container" style="flex-flow:column;justify-content:space-between;">
+            <div style="display:flex;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+        </div>
+
+        <div class="container" style="flex-flow:column;justify-content:space-between;">
+            <div style="display:flex;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+        </div>
+
+        <div class="container" style="justify-content:space-between;">
+            <div style="display:flex;flex-flow:column;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+            <div style="display:flex;flex-flow:column;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+        </div>
+
+        <div class="container" style="flex-flow:column;justify-content:space-between;">
+            <div style="display:flex;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+            <div style="display:flex;justify-content:center;;">
+                <span class="item"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+            </div>
+        </div>
+
+        <div class="container" style="flex-flow:row wrap;justify-content:space-between;">
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+          
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+
+                <span class="item"></span>
+                <span class="item"></span>
+                <span class="item"></span>
+        </div>
+
+    </div>
+</body>
+
+</html>
